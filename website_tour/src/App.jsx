@@ -5,19 +5,30 @@ import SignIn from "./pages/SignIn";
 import Search from "./pages/Search";
 import Edit from "./pages/Edit";
 import Junk from "./pages/Junk";
-
+import PrivateRoute from "./components/PrivateRoute";
+import Tour from "./pages/Tour";
+import Footer from "./components/Footer";
 
 export default function App() {
   return (
+<div className="flex flex-col min-h-screen">
     <BrowserRouter>
       <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/edit" element={<Edit />} />
-        <Route path="/junk" element={<Junk />} />
-      </Routes>
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/" element={<Search />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/edit" element={<Edit />} />
+            <Route path="/junk" element={<Junk />} />
+            <Route path="/tour/:tour_id" element={<Tour />} />
+          </Route>
+        </Routes>
+      </div>
+      <Footer />
     </BrowserRouter>
+  </div>
+    
   );
 }

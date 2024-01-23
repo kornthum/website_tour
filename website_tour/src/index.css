@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
 body{
-    background-color: rgba(228, 218, 218, 0.805);
+    background-color: #d4dab9;
+    font-family: 'Noto Sans Thai', sans-serif; /* Use the imported font */
 }

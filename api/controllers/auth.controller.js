@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
+
 export const signin = async (req, res, next) => {
   const { username, password } = req.body;
   try {
@@ -13,10 +14,13 @@ export const signin = async (req, res, next) => {
     const { password: pass, ...rest } = validUser._doc;
     res
       .cookie("access_token", token, {
-        httpOnly: true,
+        httpOnly: false,
+        maxAge: 12 * 60 * 60 * 1000
       })
       .status(200)
       .json(rest);
+
+    
   } catch (error) {
     next(error);
   }

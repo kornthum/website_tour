@@ -7,11 +7,18 @@ import {
 } from "@material-tailwind/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from '../redux/user/userSlice';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
+
   const navigate = useNavigate();
-  console.log(formData);
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({
@@ -23,6 +30,7 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -33,11 +41,14 @@ export default function SignIn() {
       const data = await res.json();
       console.log(data);
       if (data.success === false) {
+        dispatch(signInFailure(data.message));
         return;
       }
+      dispatch(signInSuccess(data));
+      //add some delay before navigate about 1 seconds
       navigate("/");
     } catch (error) {
-      console.log(error);
+      dispatch(signInFailure(error.message));
     }
   };
   return (
@@ -85,9 +96,9 @@ export default function SignIn() {
               onChange={handleChange}
             />
           </div>
-          <button>
-            Sing in
-          </button>
+          <Button type="submit">
+            Login
+          </Button>
         </form>
       </Card>
     </div>

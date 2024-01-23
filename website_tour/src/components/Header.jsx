@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar,
   Collapse,
@@ -9,9 +9,72 @@ import {
 } from "@material-tailwind/react";
 
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setNumberNewTour, setGroupMapper } from "../redux/tour/tourSlice";
 
 export default function Header() {
   const [openNav, setOpenNav] = React.useState(false);
+  const [tourNumber, setTourNumber] = useState(0);
+
+  const { currentUser } = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
+
+  const fetchItemCount = async () => {
+    try {
+      const response = await fetch("/api/tour/get_n_new_tour", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      return data; // Adjust the data structure based on your API response
+    } catch (error) {
+      console.error("Error fetching item count:", error);
+      return 0;
+    }
+  };
+
+  const fetchGroupMapper = async () => {
+    try {
+      const response = await fetch("/api/tour/get_group_mapper", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      return data; // Adjust the data structure based on your API response
+    } catch (error) {
+      console.error("Error fetching group mapper:", error);
+      return {};
+    }
+  };
+
+  useEffect(() => {
+    const updateItemCount = async () => {
+      const count = await fetchItemCount();
+      setTourNumber(count);
+      dispatch(setNumberNewTour(count));
+    };
+
+    const updateGroupMapper = async () => {
+      const mapper = await fetchGroupMapper();
+      /* Manipulate to group_id: group_name*/
+      const manipulatedMapper = {};
+
+      mapper.map((item) => {
+        manipulatedMapper[item.group_id] = item.group_name;
+      });
+
+      dispatch(setGroupMapper(manipulatedMapper));
+    };
+    if (currentUser) {
+      updateItemCount();
+      updateGroupMapper();
+    }
+  }, []);
 
   React.useEffect(() => {
     window.addEventListener(
@@ -63,7 +126,7 @@ export default function Header() {
           color="blue-gray"
           className="flex items-center gap-x-2 p-1 font-medium"
         >
-          <Badge content="0" color="red">
+          <Badge content={tourNumber} color="red">
             <Button variant="gradient" color="white" size="md">
               <p>Edit</p>
             </Button>
@@ -71,7 +134,7 @@ export default function Header() {
         </Typography>
       </Link>
 
-      <Link to="/junk">
+      {/* <Link to="/junk">
         <Typography
           as="li"
           variant="small"
@@ -103,7 +166,7 @@ export default function Header() {
             </a>
           </Button>
         </Typography>
-      </Link>
+      </Link> */}
     </ul>
   );
 
@@ -120,18 +183,27 @@ export default function Header() {
           </Typography>
         </Link>
 
-        <div className="hidden lg:block">{navList}</div>
-        <Link to="/sign-in">
-          <div className="flex items-center gap-x-1">
-            <Button
-              variant="gradient"
-              size="sm"
-              className="hidden lg:inline-block"
-            >
-              <span>Login</span>
-            </Button>
-          </div>
-        </Link>
+        {currentUser ? (
+          <div className="hidden lg:block">{navList}</div>
+        ) : (
+          <div className="text-red-500 items-center ">Please login first</div>
+        )}
+
+        {currentUser ? (
+          <div>Hi</div>
+        ) : (
+          <Link to="/sign-in">
+            <div className="flex items-center gap-x-1">
+              <Button
+                variant="gradient"
+                size="sm"
+                className="hidden lg:inline-block"
+              >
+                <span>Login</span>
+              </Button>
+            </div>
+          </Link>
+        )}
 
         <IconButton
           variant="text"
@@ -174,12 +246,17 @@ export default function Header() {
 
       <Collapse open={openNav}>
         <div className="container mx-auto">
-          {navList}
-          <div className="flex items-center gap-x-1">
-            <Button fullWidth variant="gradient" size="sm" className="">
-              <span>Login</span>
-            </Button>
-          </div>
+          {currentUser ? [navList] : null}
+
+          {currentUser ? null : (
+            <Link to="/sign-in">
+              <div className="flex items-center gap-x-1">
+                <Button fullWidth variant="gradient" size="sm" className="">
+                  <span>Login</span>
+                </Button>
+              </div>
+            </Link>
+          )}
         </div>
       </Collapse>
     </Navbar>
