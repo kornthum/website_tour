@@ -118,7 +118,7 @@ export const deleteTour = async (req, res, next) => {
   });
 
   const params = {
-    Bucket: 'linebotdev',
+    Bucket: 'linebotprod',
     Key: extractS3KeyFromUrl(s3_url)
   };
 
