@@ -12,3 +12,12 @@ export const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+// Middleware to check if user is admin
+export const isAdmin = (req, res, next) => {
+  if (req.body.role !== 'admin') {
+    return res.status(403).json({ message: "You don't have permission" });
+  } 
+  next();
+};
+

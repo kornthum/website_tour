@@ -96,6 +96,9 @@ export default function Tour() {
     fetchTourData();
   }, [param.tour_id]);
 
+  //get user role
+  const { currentUser } = useSelector((state) => state.user);
+
   const disablePastMonths = (date) => {
     const currentDate = new Date();
     return (
@@ -153,6 +156,8 @@ export default function Tour() {
     savedTour.continent
   );
 
+
+
   const handleListItemClickZone = (event, index) => {
     setSelectedIndexZone(index);
     setCheckedSubZone([]);
@@ -200,7 +205,8 @@ export default function Tour() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-        }
+        },
+        body: JSON.stringify({role: currentUser.role}),
       });
       const data = await res.json();
       { savedTour ? navigate("/") : navigate("/edit")}
@@ -255,9 +261,11 @@ export default function Tour() {
           country: checkedSubZone,
           continent: selectedIndexZone,
           tags: tag,
+          role: currentUser.role,
         }),
       });
       const data = await res.json();
+      console.log(data);
       console.log(savedTour);
       {
         savedTour.continent != '' ? navigate("/") : navigate("/edit");

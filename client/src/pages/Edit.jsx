@@ -10,6 +10,8 @@ export default function Edit() {
   const { n_new_tour } = useSelector((state) => state.tour);
   const [tours, setTours] = useState([]);
 
+  const { currentUser } = useSelector((state) => state.user);
+
   useEffect(() => {
     fetchTours();
   }, []);
@@ -65,6 +67,7 @@ export default function Edit() {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({role: currentUser.role}),
       });
       const data = await res.json();
       console.log(data);
@@ -152,7 +155,7 @@ export default function Edit() {
         ))}
       </div>
 
-      <div className="mt-4 flex justify-center">
+      {/* <div className="mt-4 flex justify-center">
         <Button
           variant="text"
           className="flex items-center gap-2"
@@ -176,7 +179,33 @@ export default function Edit() {
         >
           Next <ArrowRightIcon strokeWidth={2} className="h-4 w-4" />
         </Button>
-      </div>
+      </div> */}
+
+      <div className="mt-4 flex flex-wrap justify-center">
+        <Button
+          variant="text"
+          className="flex items-center gap-2"
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+        >
+          <ArrowLeftIcon strokeWidth={2} className="h-4 w-4" /> Previous
+        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {[...Array(totalPages).keys()].map((index) => (
+            <IconButton key={index + 1} {...getItemProps(index + 1)}>
+              {index + 1}
+            </IconButton>
+          ))}
+        </div>
+        <Button
+          variant="text"
+          className="flex items-center gap-2"
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+        >
+          Next <ArrowRightIcon strokeWidth={2} className="h-4 w-4" />
+        </Button>
+    </div>
     </div>
   );
 }

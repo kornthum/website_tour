@@ -26,6 +26,10 @@ export default function Search() {
 
   const { group_mapper } = useSelector((state) => state.tour);
 
+  const { currentUser } = useSelector((state) => state.user);
+  const currentUserRole = currentUser.role;
+  const isAdmin = currentUserRole === "admin";
+
   const handleListItemClickZone = (event, index) => {
     setSelectedZone(index);
     setCheckedSubZone([]);
@@ -126,6 +130,9 @@ export default function Search() {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
+  
+  console.log(selectedZone);
+  console.log(startDate);
   return (
     <div className="p-4 mt-4 mx-2 lg:mx-5 lg:flex lg:flex-row bg-white rounded-xl shadow-xl">
       <div className="lg:w-1/4 lg:min-h-full lg:border-2 lg:border-green-400 lg:rounded-xl lg:border-dashed lg:border-opacity-40 p-2 mx-3">
@@ -226,7 +233,7 @@ export default function Search() {
               variant="contained"
               color="success"
               onClick={handleSearchButton}
-              disabled={selectedZone === "" || checkedSubZone.length === 0}
+              disabled={selectedZone == "" && startDate == null}
             >
               ค้นหา
             </Button>
@@ -247,6 +254,16 @@ export default function Search() {
                   ))
                 : null}
             </div>
+            <div className="flex flex-row">
+              เดือน:{" "}
+              <div className="text-red-500 font-bold">
+                {startDate
+                  ? getIncludedMonths(startDate, endDate).join(", ")
+                  : null}
+              </div>
+
+
+            </div>
           </div>
         </div>
       </div>
@@ -263,7 +280,8 @@ export default function Search() {
                     src={tour.image_url}
                     alt={`Tour ${tour._id}`}
                     className="w-full h-auto cursor-pointer"
-                    onClick={() => navigate(`/tour/${tour._id}`, { state: { tour } })}
+                    onClick=
+                    {isAdmin ? () => navigate(`/tour/${tour._id}`, { state: { tour } }) : null} 
                   />
                   <div>
                     <div className="truncate font-bold">

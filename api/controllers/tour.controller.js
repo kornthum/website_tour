@@ -60,22 +60,30 @@ export const searchTour = async (req, res) => {
     // Assuming you have the country and continent in the query parameters
     const { country, continent, tour_month } = req.query;
 
-    // Convert the comma-separated string to an array of countries
-    const countryArray = country.split(",");
+    let query = {};
+
+    if (continent) {
+      query.continent = continent;
+    }
+
+    if (country) {
+      // Convert the comma-separated string to an array of countries
+      const countryArray = country.split(",");
+      query.country = { $in: countryArray };
+    }
 
     let tourMonthArray = [];
     if (tour_month) {
       tourMonthArray = tour_month.split(",");
     }
 
-    let query = {
-      country: { $in: countryArray },
-      continent: continent,
-    };
-
     if (tourMonthArray.length > 0) {
       query.tour_month = { $in: tourMonthArray };
     }
+
+    //query only delete_at != "9999-99-99 99:99:99"
+    query.delete_at = { $ne: "9999-99-99 99:99:99" };
+
     // Perform the search based on provided countries and continent
     const tours = await Tour.find(query);
 
@@ -85,7 +93,6 @@ export const searchTour = async (req, res) => {
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
-
 
 export const getGroupMapper = async (req, res, next) => {
   try {
