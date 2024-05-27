@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setNumberNewTour, setGroupMapper } from "../redux/tour/tourSlice";
+import { signOutUserSuccess } from "../redux/user/userSlice";
 
 export default function Header() {
   const [openNav, setOpenNav] = React.useState(false);
@@ -145,25 +146,17 @@ export default function Header() {
           </Badge>
         </Typography>
       </Link> : null}
-      
-      
+
       
 
-      {/* <Link to="/user">
-        <Typography
-          as="li"
-          variant="small"
-          color="blue-gray"
-          className="flex items-center gap-x-2 p-1 font-medium"
-        >
-          <Button variant="gradient" color="white" size="md">
-            <p>User</p>
-          </Button>
-        </Typography>
-      </Link> */}
       
     </ul>
   );
+
+  const handleSignOut = () => {
+
+    dispatch(signOutUserSuccess());
+  };
 
   return (
     <Navbar className="mx-auto px-4 py-2 lg:mt-2" fullWidth="true">
@@ -185,7 +178,14 @@ export default function Header() {
         )}
 
         {currentUser ? (
-          <div>Hi, {currentUser.username}</div>
+          <div>Hi, {currentUser.username} <Button
+              variant="gradient"
+              size="sm"
+              className="ml-4"
+              onClick={handleSignOut}
+            >
+              Sign Out
+        </Button></div>
         ) : (
           <Link to="/sign-in">
             <div className="flex items-center gap-x-1">
@@ -199,6 +199,7 @@ export default function Header() {
             </div>
           </Link>
         )}
+        
 
         <IconButton
           variant="text"
