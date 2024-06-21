@@ -262,6 +262,7 @@ export default function Tour() {
           continent: selectedIndexZone,
           tags: tag,
           role: currentUser.role,
+          in_junk: false,
         }),
       });
       const data = await res.json();

@@ -13,12 +13,15 @@ import DatePicker from "react-datepicker";
 import { useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
-
+import { ClipboardIcon } from "@heroicons/react/24/outline";
+import {  IconButton as Icon } from "@material-tailwind/react";
 export default function Search() {
   const navigate = useNavigate();
 
   const [selectedZone, setSelectedZone] = useState("");
+  console.log(selectedZone);
   const [checkedSubZone, setCheckedSubZone] = useState([]);
+  console.log(checkedSubZone);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
@@ -55,9 +58,21 @@ export default function Search() {
 
   const disablePastMonths = (date) => {
     const currentDate = new Date();
-    return date >= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    return (
+      date >= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+    );
   };
-
+  const handleCopyToClipboard = (tour) => {
+    const textToCopy = `${tour._id}`;
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        alert("Copied to clipboard!");
+      })
+      .catch((error) => {
+        console.error("Failed to copy text: ", error);
+      });
+  };
   const handleSearchButton = async () => {
     try {
       const encodedZone = encodeURIComponent(selectedZone);
@@ -77,6 +92,7 @@ export default function Search() {
       );
 
       const data = await response.json();
+      console.log(data)
       setSearchResults(data.data);
     } catch (error) {
       console.error("Error searching tours:", error);
@@ -130,7 +146,6 @@ export default function Search() {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
-  
   console.log(selectedZone);
   console.log(startDate);
   return (
@@ -261,8 +276,6 @@ export default function Search() {
                   ? getIncludedMonths(startDate, endDate).join(", ")
                   : null}
               </div>
-
-
             </div>
           </div>
         </div>
@@ -280,14 +293,31 @@ export default function Search() {
                     src={tour.image_url}
                     alt={`Tour ${tour._id}`}
                     className="w-full h-auto cursor-pointer"
-                    onClick=
-                    {isAdmin ? () => navigate(`/tour/${tour._id}`, { state: { tour } }) : null} 
+                    onClick={
+                      isAdmin
+                        ? () =>
+                            navigate(`/tour/${tour._id}`, { state: { tour } })
+                        : null
+                    }
                   />
                   <div>
-                    <div className="truncate font-bold">
+                    {/* <div className="truncate font-bold">
                       กรุ๊ป:{" "}
                       <span className="text-green-800">{group_mapper[tour.group_id] || ''}</span>
+                    </div> */}
+                    <div className="flex flex-row justify-between items-center mt-2">
+                      <div>
+                        id:{" "}
+                        <span className="text-black font-bold">{tour._id}</span>
+                      </div>
+                      <Icon
+                        onClick={() => handleCopyToClipboard(tour)}
+                        className="bg-green-200 rounded-full"
+                      >
+                        <ClipboardIcon className="h-5 w-5 text-black" />
+                      </Icon>
                     </div>
+
                     <div className="flex flex-row gap-2">
                       {tour.tags.length > 0 ? (
                         <div className="font-bold">แท็ก: </div>
@@ -303,12 +333,12 @@ export default function Search() {
                           ))
                         : null}
                     </div>
-                    <div className="flex flex-row justify-between">
+                    {/* <div className="flex flex-row justify-between">
                       <div className="text-gray-600">({tour.pos_dt})</div>
                       <div className="text-red-700">
                         {tour.delete_at.split(" ")[0]}
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               )}

@@ -1,25 +1,30 @@
 import { Button, Dialog, IconButton } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
-import useWindowSize from '../utils/functions'; // Adjust the import path as necessary
+import {
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  ClipboardIcon,
+} from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+import useWindowSize from "../utils/functions"; // Adjust the import path as necessary
 
-export default function Edit() {
-  const { n_new_tour } = useSelector((state) => state.tour);
+export default function Junk() {
   const [tours, setTours] = useState([]);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Default value for small screens
   const { currentUser } = useSelector((state) => state.user);
   const { width } = useWindowSize(); // Get the window width
-
+  const isAdmin = currentUser.role === "admin";
+  const navigate = useNavigate();
   useEffect(() => {
     fetchTours();
   }, []);
 
   useEffect(() => {
     if (width < 640) {
-      setItemsPerPage(5); // Small screens
+      setItemsPerPage(10); // Small screens
     } else if (width < 768) {
-      setItemsPerPage(9); // Medium screens
+      setItemsPerPage(10); // Medium screens
     } else {
       setItemsPerPage(15); // Large screens
     }
@@ -27,7 +32,7 @@ export default function Edit() {
 
   const fetchTours = async () => {
     try {
-      const response = await fetch("/api/tour/get_new_tour", {
+      const response = await fetch("/api/tour/get_validated_tour", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -42,7 +47,6 @@ export default function Edit() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageGroup, setPageGroup] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // Default value for small screens
 
   const totalPages = Math.ceil((tours?.length || 0) / itemsPerPage);
 
@@ -77,7 +81,7 @@ export default function Edit() {
           key={i}
           onClick={() => handlePageClick(i)}
           className={`${
-            currentPage === i ? "bg-green-200 text-black" : "bg-black text-white"
+            currentPage === i ? "bg-blue-200 text-black" : "bg-black text-white"
           }`}
         >
           {i}
@@ -88,91 +92,54 @@ export default function Edit() {
     return pages;
   };
 
-  const handleClickDelete = async (id) => {
-    try {
-      const res = await fetch(`/api/tour/delete_tour/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ role: currentUser.role }),
+  const handleCopyToClipboard = (tour) => {
+    const textToCopy = `${tour._id}`;
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        alert("Copied to clipboard!");
+      })
+      .catch((error) => {
+        console.error("Failed to copy text: ", error);
       });
-      const data = await res.json();
-      console.log(data);
-    } catch (error) {
-      console.error("Error deleting tour:", error);
-    }
-    window.location.reload();
   };
 
   return (
-    <div className="px-5 py-5 mt-4 mx-5 drop-shadow-md rounded-lg bg-white">
+    <div className="px-5 py-5 mt-4 mx-5 drop-shadow-md rounded-lg bg-green-100">
       <p className="flex flex-rows justify-between items-center">
         <p>
-          <span className="text-2xl font-test">มีรูปภาพเหลือค้างจำนวน:</span>
-          <span className="text-2xl font-test font-bold text-red-600">
-            {" "}
-            {n_new_tour}
-          </span>
+          <span className="text-2xl font-test text-gray-800">พื้นที่ค้นหา</span>
         </p>
-        <Button
-          variant="gradient"
-          className="flex items-center gap-3 font-test"
-          disabled
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
-            />
-          </svg>
-          Upload Image
-        </Button>
       </p>
 
-      <div className={`grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5 mt-6 drop-shadow-sm`}>
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6 drop-shadow-sm`}
+      >
         {currentItems.map((tour) => (
           <div
             key={tour.id}
             className="border-2 border-dotted border-opacity-30 rounded-md border-black p-5 "
           >
             {tour.image_url && (
-              <div>
-                <Link to={`/tour/${tour._id}`}>
-                  <img
+              <div className="flex flex-col justify-center items-center gap-2">
+
+                <img
                     src={tour.image_url}
                     alt={`Tour ${tour.id}`}
                     className="w-full h-auto cursor-pointer"
-                  />
-                </Link>
+                    onClick =  {isAdmin ? () => navigate(`/tour/${tour._id}`, { state: { tour } }) : null}
+                />
+                <div className="flex flex-rows justify-center items-center gap-2">
+                  <p className="font-tes text-white bg-green-800 p-2 rounded-xl text-xl">{tour._id}</p>
+                  <IconButton
+                    onClick={() => handleCopyToClipboard(tour)}
+                    className="bg-blue-800"
+                  >
+                    <ClipboardIcon className="h-5 w-5" />
+                  </IconButton>
+                </div>
               </div>
             )}
-            <div className="mt-2 flex flex-rows justify-between">
-              <div>
-                <Link to={`/tour/${tour._id}`}>
-                  <Button color="blue" className="font-test">
-                    แก้ไข
-                  </Button>
-                </Link>
-              </div>
-              <div>
-                <Button
-                  color="red"
-                  className="font-test"
-                  onClick={() => handleClickDelete(tour._id)}
-                >
-                  ลบทิ้ง
-                </Button>
-              </div>
-            </div>
           </div>
         ))}
       </div>

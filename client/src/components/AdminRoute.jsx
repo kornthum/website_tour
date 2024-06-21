@@ -6,11 +6,11 @@ const AdminRoute = () => {
   const parsedData = JSON.parse(storedData);
   const user = JSON.parse(parsedData.user);
   const currentUser = user.currentUser;
-  console.log(currentUser.role);
+  // console.log(currentUser.role);
 
 
   if (currentUser.role !== 'admin') {
-    return <Navigate to="/" />;
+    return <Navigate to="/field" />;
   }
 
   return <Outlet />;

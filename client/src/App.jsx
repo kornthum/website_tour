@@ -5,8 +5,10 @@ import Search from "./pages/Search";
 import Edit from "./pages/Edit";
 import Junk from "./pages/Junk";
 import User from "./pages/User";
+import Field from "./pages/Field";
 import PrivateRoute from "./components/PrivateRoute";
 import Tour from "./pages/Tour";
+import AdminSearch from "./pages/AdminSearch";
 import Footer from "./components/Footer";
 import AdminRoute from "./components/AdminRoute";
 
@@ -20,12 +22,14 @@ export default function App() {
           <Route path="/sign-in" element={<SignIn />} />
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<Search />} />
+            <Route path="/field" element={<Field />} />
             <Route path="/search" element={<Search />} />
             <Route element={<AdminRoute />}>
               <Route path="/edit" element={<Edit />} />
               <Route path="/tour/:tour_id" element={<Tour />} />
+              <Route path="/junk" element={<Junk />} />
+              <Route path="/adminSearch" element={<AdminSearch />} />
             </Route>
-            <Route path="/junk" element={<Junk />} />
             <Route path="/user" element={<User />} />
           </Route>
         </Routes>

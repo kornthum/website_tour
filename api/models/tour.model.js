@@ -42,6 +42,10 @@ const tourSchema = new mongoose.Schema(
     image_hash: {
       type: String,
       required: false,
+    },
+    price: {
+      type: Number,
+      required: false,
     }
   },
   { timestamps: false },

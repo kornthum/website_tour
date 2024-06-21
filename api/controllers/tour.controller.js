@@ -17,7 +17,16 @@ export const getNumberDataWithEmptyLabels = async (req, res, next) => {
 
 export const getDataWithEmptyLabels = async (req, res, next) => {
   try {
-    const data = await Tour.find({ country: [], in_junk: false });
+    const data = await Tour.find({ country: [], in_junk: false }).sort({pos_dt: 1});
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getInJunkData = async (req, res, next) => {
+  try {
+    const data = await Tour.find({ in_junk: true });
     res.status(200).json(data);
   } catch (error) {
     next(error);
@@ -60,6 +69,8 @@ export const searchTour = async (req, res) => {
     // Assuming you have the country and continent in the query parameters
     const { country, continent, tour_month } = req.query;
 
+    console.log(country);
+    console.log(continent);
     let query = {};
 
     if (continent) {
@@ -83,9 +94,12 @@ export const searchTour = async (req, res) => {
 
     //query only delete_at != "9999-99-99 99:99:99"
     query.delete_at = { $ne: "9999-99-99 99:99:99" };
+    
+    console.log(query)
 
     // Perform the search based on provided countries and continent
     const tours = await Tour.find(query);
+    console.log(tours)
 
     res.status(200).json({ success: true, data: tours });
   } catch (error) {
@@ -102,6 +116,27 @@ export const getGroupMapper = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getTourById = async (req, res, next) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    res.status(200).json(tour);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getValidatedTour = async (req, res, next) => {
+  try {
+    const tours = await Tour.find(
+      { delete_at: { $ne: "9999-99-99 99:99:99" },
+        in_junk: false},
+    ).sort({pos_dt: -1});
+    res.status(200).json(tours);
+  } catch (error) {
+    next(error);
+  }
+}
 
 export const deleteTour = async (req, res, next) => {
   console.log(req.params.id);

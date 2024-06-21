@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDataWithEmptyLabels, getNumberDataWithEmptyLabels, getTour, updateInJunk, updateTour, searchTour, getGroupMapper, deleteTour } from '../controllers/tour.controller.js';
+import { getDataWithEmptyLabels, getNumberDataWithEmptyLabels, getTour, updateInJunk, updateTour, searchTour, getGroupMapper, deleteTour, getInJunkData, getValidatedTour } from '../controllers/tour.controller.js';
 import { isAdmin, verifyToken } from '../utils/verifyUsers.js';
 
 
@@ -13,5 +13,7 @@ router.patch('/update_tour/:id', verifyToken, isAdmin, updateTour);
 router.get('/search_tour/', verifyToken, searchTour);
 router.get('/get_group_mapper/', getGroupMapper)
 router.delete('/delete_tour/:id', verifyToken, isAdmin, deleteTour);
+router.get('/get_in_junk', verifyToken, getInJunkData);
+router.get('/get_validated_tour', verifyToken, getValidatedTour);
 
 export default router;

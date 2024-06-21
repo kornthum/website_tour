@@ -18,13 +18,12 @@ export default function Header() {
   const [tourNumber, setTourNumber] = useState(0);
 
   const { currentUser } = useSelector((state) => state.user);
-  console.log(currentUser)
-  let isAdmin = false
+  console.log(currentUser);
+  let isAdmin = false;
   if (currentUser) {
     const currentUserRole = currentUser.role;
     isAdmin = currentUserRole === "admin";
   }
- 
 
   const dispatch = useDispatch();
 
@@ -98,6 +97,27 @@ export default function Header() {
 
   const navList = (
     <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
+
+<Link to="/field">
+        <Typography
+          as="li"
+          variant="small"
+          color="blue-gray"
+          className="flex items-center gap-x-2 p-1 font-medium"
+        >
+          <a href="#" className="flex items-center">
+            <Button
+              className="flex flex-row items-center gap-2"
+              variant="gradient"
+              size="md"
+              color="white"
+            >
+              <p>All Tour</p>
+            </Button>
+          </a>
+        </Typography>
+      </Link>
+
       <Link to="/search">
         <Typography
           as="li"
@@ -132,29 +152,59 @@ export default function Header() {
         </Typography>
       </Link>
 
-      {isAdmin ? <Link to={isAdmin ? "/edit" : "/"} >
-        <Typography
-          as="li"
-          variant="small"
-          color="blue-gray"
-          className="flex items-center gap-x-2 p-1 font-medium"
-        >
-          <Badge content={tourNumber} color="red">
-            <Button variant="gradient" color="white" size="md">
-              <p>Edit</p>
-            </Button>
-          </Badge>
-        </Typography>
-      </Link> : null}
+      {isAdmin ? (
+        <Link to={isAdmin ? "/edit" : "/"}>
+          <Typography
+            as="li"
+            variant="small"
+            color="blue-gray"
+            className="flex items-center gap-x-2 p-1 font-medium"
+          >
+            <Badge content={tourNumber} color="red">
+              <Button variant="gradient" color="white" size="md">
+                <p>Edit</p>
+              </Button>
+            </Badge>
+          </Typography>
+        </Link>
+      ) : null}
 
-      
+      {isAdmin ? (
+        <Link to={isAdmin ? "/adminsearch" : "/"}>
+          <Typography
+            as="li"
+            variant="small"
+            color="blue-gray"
+            className="flex items-center gap-x-2 p-1 font-medium"
+          >
+            <Button variant="gradient" color="white" size="md">
+              <p>Admin Search</p>
+            </Button>
+          </Typography>
+        </Link>
+      ) : null}
+
+
+      {isAdmin ? (
+        <Link to={isAdmin ? "/junk" : "/"}>
+          <Typography
+            as="li"
+            variant="small"
+            color="white"
+            className="flex items-center gap-x-2 p-1 font-medium"
+          >
+            <Button variant="gradient" color="red" size="md">
+              <p>Junk</p>
+            </Button>
+          </Typography>
+        </Link>
+      ) : null}
 
       
     </ul>
   );
 
   const handleSignOut = () => {
-
     dispatch(signOutUserSuccess());
   };
 
@@ -167,7 +217,7 @@ export default function Header() {
             href="#"
             className="mr-4 cursor-pointer py-1.5 font-medium"
           >
-            TOUR SEARCH
+            V7 TOUR SEARCH
           </Typography>
         </Link>
 
@@ -178,14 +228,17 @@ export default function Header() {
         )}
 
         {currentUser ? (
-          <div>Hi, {currentUser.username} <Button
+          <div>
+            Hi, {currentUser.username}{" "}
+            <Button
               variant="gradient"
               size="sm"
               className="ml-4"
               onClick={handleSignOut}
             >
               Sign Out
-        </Button></div>
+            </Button>
+          </div>
         ) : (
           <Link to="/sign-in">
             <div className="flex items-center gap-x-1">
@@ -199,7 +252,6 @@ export default function Header() {
             </div>
           </Link>
         )}
-        
 
         <IconButton
           variant="text"

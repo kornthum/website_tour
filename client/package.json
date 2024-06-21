@@ -17,6 +17,7 @@
     "@heroicons/react": "^2.0.18",
     "@material-tailwind/react": "^2.1.7",
     "@mui/material": "^5.15.3",
+    "@react-hook/window-size": "^3.1.1",
     "@reduxjs/toolkit": "^2.0.1",
     "chip-input": "^0.3.2",
     "date-fns": "^3.2.0",
