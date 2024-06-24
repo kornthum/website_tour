@@ -94,11 +94,12 @@ export default function Search() {
 
       const data = await response.json();
       setSearchResults(data.data);
+      setCurrentPage(1); // Reset to the first page
+      setPageGroup(1); // Reset to the first page group
     } catch (error) {
       console.error("Error searching tours:", error);
     }
   };
-
   const handleClearButton = (event) => {
     setStartDate(null);
     setEndDate(null);
@@ -375,7 +376,9 @@ export default function Search() {
             >
               Previous
             </Button>
-            <div className="flex items-center gap-2 flex-wrap">{renderPagination()}</div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {renderPagination()}
+            </div>
             <Button
               variant="text"
               className="pagination-button"
