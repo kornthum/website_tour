@@ -14,21 +14,20 @@ import { useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
-import {  IconButton as Icon } from "@material-tailwind/react";
+import { IconButton as Icon } from "@material-tailwind/react";
+
 export default function Search() {
   const navigate = useNavigate();
 
   const [selectedZone, setSelectedZone] = useState("");
-  console.log(selectedZone);
   const [checkedSubZone, setCheckedSubZone] = useState([]);
-  console.log(checkedSubZone);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageGroup, setPageGroup] = useState(1);
 
   const { group_mapper } = useSelector((state) => state.tour);
-
   const { currentUser } = useSelector((state) => state.user);
   const currentUserRole = currentUser.role;
   const isAdmin = currentUserRole === "admin";
@@ -62,6 +61,7 @@ export default function Search() {
       date >= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
     );
   };
+
   const handleCopyToClipboard = (tour) => {
     const textToCopy = `${tour._id}`;
     navigator.clipboard
@@ -73,6 +73,7 @@ export default function Search() {
         console.error("Failed to copy text: ", error);
       });
   };
+
   const handleSearchButton = async () => {
     try {
       const encodedZone = encodeURIComponent(selectedZone);
@@ -92,11 +93,9 @@ export default function Search() {
       );
 
       const data = await response.json();
-      console.log(data)
       setSearchResults(data.data);
     } catch (error) {
       console.error("Error searching tours:", error);
-      // Handle error, show error message, etc.
     }
   };
 
@@ -138,16 +137,46 @@ export default function Search() {
   const endIdx = startIdx + itemsPerPage;
   const currentItems = searchResults?.slice(startIdx, endIdx) || [];
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  const handleNextPageGroup = () => {
+    setPageGroup((prevGroup) =>
+      Math.min(prevGroup + 1, Math.ceil(totalPages / 10))
+    );
+    setCurrentPage((pageGroup + 1) * 10 - 9);
   };
 
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  const handlePrevPageGroup = () => {
+    setPageGroup((prevGroup) => Math.max(prevGroup - 1, 1));
+    setCurrentPage((pageGroup - 1) * 10 - 9);
   };
 
-  console.log(selectedZone);
-  console.log(startDate);
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  const renderPagination = () => {
+    const startPage = (pageGroup - 1) * 10 + 1;
+    const endPage = Math.min(startPage + 9, totalPages);
+    const pages = [];
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <Icon
+          key={i}
+          onClick={() => handlePageClick(i)}
+          className={`${
+            currentPage === i
+              ? "bg-green-200 text-gray-800"
+              : "bg-gray-800 text-white"
+          } rounded`}
+        >
+          {i}
+        </Icon>
+      );
+    }
+
+    return pages;
+  };
+
   return (
     <div className="p-4 mt-4 mx-2 lg:mx-5 lg:flex lg:flex-row bg-white rounded-xl shadow-xl">
       <div className="lg:w-1/4 lg:min-h-full lg:border-2 lg:border-green-400 lg:rounded-xl lg:border-dashed lg:border-opacity-40 p-2 mx-3">
@@ -301,10 +330,6 @@ export default function Search() {
                     }
                   />
                   <div>
-                    {/* <div className="truncate font-bold">
-                      กรุ๊ป:{" "}
-                      <span className="text-green-800">{group_mapper[tour.group_id] || ''}</span>
-                    </div> */}
                     <div className="flex flex-row justify-between items-center mt-2">
                       <div>
                         id:{" "}
@@ -333,12 +358,6 @@ export default function Search() {
                           ))
                         : null}
                     </div>
-                    {/* <div className="flex flex-row justify-between">
-                      <div className="text-gray-600">({tour.pos_dt})</div>
-                      <div className="text-red-700">
-                        {tour.delete_at.split(" ")[0]}
-                      </div>
-                    </div> */}
                   </div>
                 </div>
               )}
@@ -347,31 +366,21 @@ export default function Search() {
         </div>
 
         {searchResults.length > 0 ? (
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 flex justify-center pagination-container">
             <Button
               variant="text"
-              className="flex items-center gap-2"
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
+              className="pagination-button"
+              onClick={handlePrevPageGroup}
+              disabled={pageGroup === 1}
             >
               Previous
             </Button>
-            <div className="flex items-center gap-2">
-              {[...Array(totalPages).keys()].map((index) => (
-                <IconButton
-                  key={index + 1}
-                  color={currentPage === index + 1 ? "success" : "default"}
-                  onClick={() => setCurrentPage(index + 1)}
-                >
-                  {index + 1}
-                </IconButton>
-              ))}
-            </div>
+            <div className="flex items-center gap-2 flex-wrap">{renderPagination()}</div>
             <Button
               variant="text"
-              className="flex items-center gap-2"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
+              className="pagination-button"
+              onClick={handleNextPageGroup}
+              disabled={pageGroup === Math.ceil(totalPages / 10)}
             >
               Next
             </Button>

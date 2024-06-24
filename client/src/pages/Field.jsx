@@ -118,7 +118,7 @@ export default function Junk() {
         {currentItems.map((tour) => (
           <div
             key={tour.id}
-            className="border-2 border-dotted border-opacity-30 rounded-md border-black p-5 "
+            className="border-2 border-dotted border-opacity-30 rounded-md border-black p-3"
           >
             {tour.image_url && (
               <div className="flex flex-col justify-center items-center gap-2">
@@ -126,11 +126,11 @@ export default function Junk() {
                 <img
                     src={tour.image_url}
                     alt={`Tour ${tour.id}`}
-                    className="w-full h-auto cursor-pointer"
+                    className="w-auto h-auto cursor-pointer"
                     onClick =  {isAdmin ? () => navigate(`/tour/${tour._id}`, { state: { tour } }) : null}
                 />
-                <div className="flex flex-rows justify-center items-center gap-2">
-                  <p className="font-tes text-white bg-green-800 p-2 rounded-xl text-xl">{tour._id}</p>
+                <div className="flex flex-rows justify-center items-center gap-2 mx-2">
+                  <p className="font-test text-white bg-green-800 rounded-l text-xl">{tour._id}</p>
                   <IconButton
                     onClick={() => handleCopyToClipboard(tour)}
                     className="bg-blue-800"
